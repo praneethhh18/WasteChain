@@ -1,4 +1,7 @@
-const BASE = "/api";
+// In dev, Vite proxies "/api" → http://127.0.0.1:8765 (see vite.config.ts).
+// In prod, set VITE_API_BASE at build time to your backend URL, e.g.
+//   VITE_API_BASE=https://wastechain-api.onrender.com
+const BASE = (import.meta as any).env?.VITE_API_BASE || "/api";
 
 async function call<T = any>(path: string, init?: RequestInit): Promise<T> {
   const r = await fetch(BASE + path, {
@@ -119,7 +122,7 @@ export const api = {
     const fd = new FormData();
     fd.append("material", material);
     fd.append("photo", photoBlob, "sack.jpg");
-    const r = await fetch("/api/inspect", { method: "POST", body: fd });
+    const r = await fetch(BASE + "/inspect", { method: "POST", body: fd });
     if (!r.ok) throw new Error("inspect failed");
     return r.json();
   },

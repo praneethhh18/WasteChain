@@ -1,0 +1,29 @@
+# Render Blueprint — one-click deploy for the WasteChain backend + Postgres.
+# After connecting the GitHub repo in Render, choose "New > Blueprint" and
+# point at this file. Render will provision both services.
+
+services:
+  - type: web
+    name: wastechain-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wastechain-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        sync: false   # set this manually after Vercel frontend is deployed
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.11"
+
+databases:
+  - name: wastechain-db
+    plan: free
+    databaseName: wastechain
+    user: wastechain

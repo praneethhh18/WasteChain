@@ -7,3 +7,6 @@ python-multipart>=0.0.18
 python-jose[cryptography]>=3.3.0
 httpx>=0.28.1
 python-dotenv>=1.0.1
+# Postgres driver — used in production. Falls through to SQLite in dev
+# when DATABASE_URL isn't set.
+psycopg2-binary>=2.9.9

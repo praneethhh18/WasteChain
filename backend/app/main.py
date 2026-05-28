@@ -22,6 +22,31 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
+
+# ─── Auto-seed on first boot ────────────────────────────────────────────
+# When deployed (Render / Railway), the Postgres DB starts empty. Rather
+# than ask the user to SSH in and run `python -m app.seed`, we detect an
+# empty DB on first startup and seed it automatically. Subsequent boots
+# see existing data and skip.
+def _maybe_seed_on_first_boot() -> None:
+    from .db import SessionLocal
+    from .seed import seed as run_seed
+    db = SessionLocal()
+    try:
+        n_orgs = db.query(models.Organization).count()
+    finally:
+        db.close()
+    if n_orgs == 0:
+        print("[WasteChain] empty database detected — running first-boot seed...")
+        try:
+            run_seed()
+            print("[WasteChain] seed complete.")
+        except Exception as e:
+            print(f"[WasteChain] seed failed: {e}")
+
+
+_maybe_seed_on_first_boot()
+
 app.include_router(auth.router)
 app.include_router(batches.router)
 app.include_router(handoffs.router)
