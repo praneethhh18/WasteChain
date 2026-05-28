@@ -103,7 +103,11 @@ class Batch(Base):
 
     # Optional upstream link — set when a kabadiwala buys from a ragpicker.
     # Lets us walk the chain back: batch → recovery → aggregation point → route → pickups.
-    source_recovery_id = Column(Integer, ForeignKey("ragpicker_recoveries.id"), nullable=True)
+    source_recovery_id = Column(
+        Integer,
+        ForeignKey("ragpicker_recoveries.id", use_alter=True, name="fk_batches_source_recovery"),
+        nullable=True,
+    )
 
     creator = relationship("User", back_populates="batches", foreign_keys=[creator_id])
     handoffs = relationship("Handoff", back_populates="batch", cascade="all, delete-orphan")

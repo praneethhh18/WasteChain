@@ -106,7 +106,19 @@ RECYCLER_BIDS = [
 
 
 def seed():
-    Base.metadata.drop_all(bind=engine)
+    # Nuke any existing schema. We can't use Base.metadata.drop_all() because
+    # batches ↔ ragpicker_recoveries have a circular FK that SQLAlchemy can't
+    # topo-sort for drop. Postgres: DROP SCHEMA cascades through everything.
+    # SQLite: just delete the file's tables by dropping each one with FK off.
+    from sqlalchemy import text
+    with engine.begin() as conn:
+        if engine.dialect.name == "postgresql":
+            conn.execute(text("DROP SCHEMA public CASCADE"))
+            conn.execute(text("CREATE SCHEMA public"))
+        else:
+            conn.execute(text("PRAGMA foreign_keys = OFF"))
+            Base.metadata.drop_all(bind=conn)
+            conn.execute(text("PRAGMA foreign_keys = ON"))
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
