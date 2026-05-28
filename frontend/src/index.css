@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background: #0a0d0b;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle ambient glow without overdoing it */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1000px 600px at 85% -5%, rgba(46,234,132,0.07), transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, rgba(245,207,111,0.05), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+#root { position: relative; z-index: 1; }
+
+[lang="hi"] body, .lang-hi { font-family: 'Noto Sans Devanagari', 'Inter', sans-serif; }
+[lang="kn"] body, .lang-kn { font-family: 'Noto Sans Kannada', 'Inter', sans-serif; }
+
+.font-display { font-family: 'Fraunces', ui-serif, Georgia, serif; font-feature-settings: "ss01" 1; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* Leaflet tweaks — calmer dark map */
+.leaflet-container { background: #0a0d0b; }
+.leaflet-tile { filter: brightness(0.55) saturate(0.6) hue-rotate(-10deg); }
+.leaflet-control-attribution {
+  background: rgba(10,13,11,0.7) !important;
+  color: #8a9a93 !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a { color: #2eea84 !important; }
+.leaflet-popup-content-wrapper { background: #10171a !important; color: #e2e8f0 !important; border: 1px solid #1c2823; }
+.leaflet-popup-tip { background: #10171a !important; }
+
+/* Leaflet's internal panes use z-index 400+ by default — that pops above
+   any Tailwind z-50 modal. Cap them so our modals (now at z-[1000])
+   always sit on top instead of the map bleeding through. */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom { z-index: 5 !important; }
+.leaflet-control { z-index: 6 !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #1c2823; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3d31; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Smooth focus */
+*:focus { outline: none; }
+*:focus-visible { outline: 2px solid #2eea84; outline-offset: 2px; border-radius: 4px; }
+
+/* Reveal-on-scroll utility */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* Shimmer text for "live" elements */
+.shimmer-text {
+  background: linear-gradient(90deg, #8a9a93 0%, #2eea84 50%, #8a9a93 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 2.8s linear infinite;
+}
+
+/* Soft selection */
+::selection { background: rgba(46,234,132,0.3); color: #f5e6d3; }
